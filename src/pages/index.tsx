@@ -1,13 +1,22 @@
+import { useState, useMemo } from "react";
 import Head from "next/head";
 import { Inter, Open_Sans } from "@next/font/google";
 import { trpc } from "@utils/trpc";
+import { getOptionsForVote } from "@utils/getRandomPokemon";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-    const { data, isLoading, isError, isLoadingError } = trpc.hello.useQuery({
-        text: "Yousaf",
+    const [isLoading] = useState(false);
+    // const { firstId, secondId } = getOptionsForVote();
+    const [ids, setIds] = useState(getOptionsForVote());
+    const firstPokemon = trpc["get-pokemon-by-id"].useQuery({
+        id: ids.firstId,
     });
+    const secondPokemon = trpc["get-pokemon-by-id"].useQuery({
+        id: ids.secondId,
+    });
+
     if (isLoading) {
         return (
             <>
@@ -45,25 +54,39 @@ export default function Home() {
                     className={"min-h-screen w-full grid place-content-center"}
                 >
                     <div className="space-y-6 p-8">
-                        <h1 className="font-bold text-4xl text-center">
-                            {data?.greeting}
-                        </h1>
+                        <h1 className="font-bold text-4xl text-center"></h1>
                         <h1 className="font-bold text-4xl text-center">
                             Which Pokemon is the roundest
                         </h1>
                         <div className="border rounded p-8">
                             <div className="flex space-x-5 items-center">
-                                <img
-                                    src="https://placeimg.com/800/200/arch"
-                                    alt=""
-                                    className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
-                                />
+                                <div className="space-y-2">
+                                    <img
+                                        src={
+                                            firstPokemon.data?.pokemon.sprites
+                                                .front_default
+                                        }
+                                        alt=""
+                                        className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
+                                    />
+                                    <p className="text-center capitalize">
+                                        {firstPokemon.data?.pokemon.name}
+                                    </p>
+                                </div>
                                 <span>Vs</span>
-                                <img
-                                    src="https://placeimg.com/800/200/arch"
-                                    alt=""
-                                    className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
-                                />
+                                <div className="space-y-2">
+                                    <img
+                                        src={
+                                            secondPokemon.data?.pokemon.sprites
+                                                .front_default
+                                        }
+                                        alt=""
+                                        className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
+                                    />
+                                    <p className="text-center capitalize">
+                                        {secondPokemon.data?.pokemon.name}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
