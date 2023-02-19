@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, useReducer } from "react";
 import Head from "next/head";
 import { Inter, Open_Sans } from "@next/font/google";
 import { trpc } from "@utils/trpc";
@@ -7,17 +7,55 @@ import { getOptionsForVote } from "@utils/getRandomPokemon";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-    const [isLoading] = useState(false);
+    const [state, dispatch] = useReducer(
+        (state: any, action: any) => {
+            const { type, payload } = action;
+            switch (type) {
+                case "NEW_IDS":
+                    return {
+                        ...state,
+                        ids: getOptionsForVote(),
+                    };
+                case "SET_CHOSEN_ID":
+                    return {
+                        ...state,
+                        chosenId: payload,
+                    };
+                default:
+                    return state;
+            }
+        },
+        {
+            ids: getOptionsForVote(),
+            chosenId: null,
+        }
+    );
     // const { firstId, secondId } = getOptionsForVote();
     const [ids, setIds] = useState(getOptionsForVote());
-    const firstPokemon = trpc["get-pokemon-by-id"].useQuery({
-        id: ids.firstId,
-    });
-    const secondPokemon = trpc["get-pokemon-by-id"].useQuery({
-        id: ids.secondId,
+
+    const {
+        data,
+        isLoading,
+        isError,
+        error,
+        refetch: refetchPoke,
+    } = trpc["get-pokemon"].useQuery({
+        firstId: state.ids.firstId,
+        secondId: state.ids.secondId,
     });
 
-    if (isLoading) {
+    const castVote = (id: number) => {
+        // todo: fire mutation for the vote caste
+        dispatch({ type: "SET_CHOSEN_ID", payload: id });
+        const timer = setTimeout(() => {
+            dispatch({ type: "NEW_IDS" });
+            refetchPoke();
+            dispatch({ type: "SET_CHOSEN_ID", payload: null });
+            clearTimeout(timer);
+        }, 3000);
+    };
+
+    if (isLoading || isError || error) {
         return (
             <>
                 <Head>
@@ -33,12 +71,17 @@ export default function Home() {
                     className={"min-h-screen w-full grid place-content-center"}
                 >
                     <h1 className="font-bold text-4xl text-center">
-                        loading....
+                        {isLoading
+                            ? "loading...."
+                            : isError
+                            ? error.message
+                            : null}
                     </h1>
                 </main>
             </>
         );
     } else {
+        const { firstPoke, secondPoke } = data;
         return (
             <>
                 <Head>
@@ -60,32 +103,64 @@ export default function Home() {
                         </h1>
                         <div className="border rounded p-8">
                             <div className="flex space-x-5 items-center">
-                                <div className="space-y-2">
+                                <div className="space-y-2 text-center relative">
+                                    <div
+                                        className={`-left-1 top-0 px-2 py-1 rounded bg-orange-400 ${
+                                            state.chosenId === state.ids.firstId
+                                                ? ""
+                                                : "hidden"
+                                        }`}
+                                    >
+                                        <p>Casting {firstPoke?.name}</p>
+                                    </div>
                                     <img
-                                        src={
-                                            firstPokemon.data?.pokemon.sprites
-                                                .front_default
-                                        }
+                                        src={firstPoke?.sprites.front_default}
                                         alt=""
                                         className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
                                     />
-                                    <p className="text-center capitalize">
-                                        {firstPokemon.data?.pokemon.name}
+                                    <p className="capitalize">
+                                        {firstPoke?.name}
                                     </p>
+                                    <button
+                                        onClick={() =>
+                                            castVote(state.ids.firstId)
+                                        }
+                                        className="px-3 py-1 rounded bg-slate-300 text-gray-900 mt-2"
+                                    >
+                                        Rounder
+                                    </button>
                                 </div>
                                 <span>Vs</span>
-                                <div className="space-y-2">
+                                <div className="space-y-2 text-center relative">
+                                    <div
+                                        className={`-left-1 top-0 px-2 py-1 rounded bg-orange-400 ${
+                                            state.chosenId ===
+                                            state.ids.secondId
+                                                ? ""
+                                                : "hidden"
+                                        }`}
+                                    >
+                                        <p>
+                                            Casting {secondPoke?.name}
+                                            ...
+                                        </p>
+                                    </div>
                                     <img
-                                        src={
-                                            secondPokemon.data?.pokemon.sprites
-                                                .front_default
-                                        }
+                                        src={secondPoke?.sprites.front_default}
                                         alt=""
                                         className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
                                     />
-                                    <p className="text-center capitalize">
-                                        {secondPokemon.data?.pokemon.name}
+                                    <p className="capitalize">
+                                        {secondPoke?.name}
                                     </p>
+                                    <button
+                                        onClick={() =>
+                                            castVote(state.ids.secondId)
+                                        }
+                                        className="px-3 py-1 rounded bg-slate-300 text-gray-900 mt-2"
+                                    >
+                                        Rounder
+                                    </button>
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { procedure, router } from "@server/trpc";
+import getPokemon from "@server/utils/getPokemon";
 
 import { PokemonClient } from "pokenode-ts";
 
@@ -26,17 +27,19 @@ export const appRouter = router({
                 word: `hi ${input.name}`,
             };
         }),
-    "get-pokemon-by-id": procedure
+    "get-pokemon": procedure
         .input(
             z.object({
-                id: z.number(),
+                firstId: z.number(),
+                secondId: z.number(),
             })
         )
         .query(async ({ input }) => {
-            const api = new PokemonClient();
-            const pokemon = await api.getPokemonById(input.id);
+            const firstPoke = await getPokemon(input.firstId);
+            const secondPoke = await getPokemon(input.secondId);
             return {
-                pokemon,
+                firstPoke,
+                secondPoke,
             };
         }),
 });
