@@ -48,7 +48,7 @@ export default function Home() {
         isLoading,
         isError,
         error,
-        refetch: refetchPoke,
+        // refetch: refetchPoke,
     } = trpc["get-pokemon"].useQuery({
         firstId: state.ids.firstId,
         secondId: state.ids.secondId,
@@ -64,7 +64,8 @@ export default function Home() {
 
         const timer = setTimeout(() => {
             dispatch({ type: "NEW_IDS" });
-            refetchPoke();
+            // Don't need to refetch, as we are using csr and component rerenders on state change causing pokemons to reload with new ids
+            // refetchPoke();
             dispatch({ type: "SET_CHOSEN_ID", payload: null });
             clearTimeout(timer);
         }, 3000);
