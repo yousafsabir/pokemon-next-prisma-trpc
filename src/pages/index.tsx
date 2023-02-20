@@ -117,7 +117,7 @@ export default function Home() {
                                         <p>Casting {firstPoke?.name}</p>
                                     </div>
                                     <img
-                                        src={firstPoke?.sprites.front_default}
+                                        src={firstPoke?.sprites.front_default as string}
                                         alt=""
                                         className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
                                     />
@@ -149,7 +149,7 @@ export default function Home() {
                                         </p>
                                     </div>
                                     <img
-                                        src={secondPoke?.sprites.front_default}
+                                        src={secondPoke?.sprites.front_default as string}
                                         alt=""
                                         className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
                                     />
