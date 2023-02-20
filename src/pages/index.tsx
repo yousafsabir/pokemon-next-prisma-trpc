@@ -2,32 +2,39 @@ import React, { useReducer } from "react";
 import Head from "next/head";
 import { trpc } from "@utils/trpc";
 import { getOptionsForVote } from "@utils/getRandomPokemon";
+import { number } from "zod";
 
+export type State = {
+    ids: {
+        firstId: number;
+        secondId: number;
+    };
+    chosenId: number | null;
+};
 
 export default function Home() {
-    const [state, dispatch] = useReducer(
-        (state: any, action: any) => {
-            const { type, payload } = action;
-            switch (type) {
-                case "NEW_IDS":
-                    return {
-                        ...state,
-                        ids: getOptionsForVote(),
-                    };
-                case "SET_CHOSEN_ID":
-                    return {
-                        ...state,
-                        chosenId: payload,
-                    };
-                default:
-                    return state;
-            }
-        },
-        {
-            ids: getOptionsForVote(),
-            chosenId: null,
+    const initialState: State = {
+        ids: getOptionsForVote(),
+        chosenId: null,
+    };
+
+    const [state, dispatch] = useReducer((state: State, action: any) => {
+        const { type, payload } = action;
+        switch (type) {
+            case "NEW_IDS":
+                return {
+                    ...state,
+                    ids: getOptionsForVote(),
+                };
+            case "SET_CHOSEN_ID":
+                return {
+                    ...state,
+                    chosenId: payload,
+                };
+            default:
+                return state;
         }
-    );
+    }, initialState);
 
     const {
         data,
