@@ -30,8 +30,6 @@ export default function Home() {
             chosenId: null,
         }
     );
-    // const { firstId, secondId } = getOptionsForVote();
-    const [ids, setIds] = useState(getOptionsForVote());
 
     const {
         data,
