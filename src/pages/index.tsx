@@ -121,71 +121,27 @@ export default function Home() {
                         </h1>
                         <div className="border rounded p-8">
                             <div className="flex space-x-5 items-center">
-                                <div className="space-y-2 text-center relative">
-                                    <div
-                                        className={`-left-1 top-0 px-2 py-1 rounded bg-orange-400 ${
-                                            state.chosenId === state.ids.firstId
-                                                ? ""
-                                                : "hidden"
-                                        }`}
-                                    >
-                                        <p>Casting {firstPoke?.name}</p>
-                                    </div>
-                                    <img
-                                        src={
-                                            firstPoke?.sprites
-                                                .front_default as string
-                                        }
-                                        alt=""
-                                        className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
-                                    />
-                                    <p className="capitalize">
-                                        {firstPoke?.name}
-                                    </p>
-                                    <button
-                                        onClick={() =>
-                                            castVote(state.ids.firstId)
-                                        }
-                                        className="px-3 py-1 rounded bg-slate-300 text-gray-900 mt-2"
-                                    >
-                                        Rounder
-                                    </button>
-                                </div>
+                                <PokemonCard
+                                    id={state.ids.firstId}
+                                    chosenId={state.chosenId}
+                                    name={data.firstPoke?.name as string}
+                                    image={
+                                        data.firstPoke?.sprites
+                                            .front_default as string
+                                    }
+                                    vote={castVote}
+                                />
                                 <span>Vs</span>
-                                <div className="space-y-2 text-center relative">
-                                    <div
-                                        className={`-left-1 top-0 px-2 py-1 rounded bg-orange-400 ${
-                                            state.chosenId ===
-                                            state.ids.secondId
-                                                ? ""
-                                                : "hidden"
-                                        }`}
-                                    >
-                                        <p>
-                                            Casting {secondPoke?.name}
-                                            ...
-                                        </p>
-                                    </div>
-                                    <img
-                                        src={
-                                            secondPoke?.sprites
-                                                .front_default as string
-                                        }
-                                        alt=""
-                                        className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
-                                    />
-                                    <p className="capitalize">
-                                        {secondPoke?.name}
-                                    </p>
-                                    <button
-                                        onClick={() =>
-                                            castVote(state.ids.secondId)
-                                        }
-                                        className="px-3 py-1 rounded bg-slate-300 text-gray-900 mt-2"
-                                    >
-                                        Rounder
-                                    </button>
-                                </div>
+                                <PokemonCard
+                                    id={state.ids.secondId}
+                                    chosenId={state.chosenId}
+                                    name={data.secondPoke?.name as string}
+                                    image={
+                                        data.secondPoke?.sprites
+                                            .front_default as string
+                                    }
+                                    vote={castVote}
+                                />
                             </div>
                         </div>
                     </div>
@@ -193,4 +149,45 @@ export default function Home() {
             </>
         );
     }
+}
+
+function PokemonCard({
+    id,
+    chosenId,
+    name,
+    image,
+    vote,
+}: {
+    id: number;
+    chosenId: number | null;
+    name: string;
+    image: string;
+    vote: (id: number) => void;
+}) {
+    return (
+        <div className="space-y-2 text-center relative">
+            <div
+                className={`-left-1 top-0 px-2 py-1 rounded bg-orange-400 ${
+                    chosenId === id ? "" : "hidden"
+                }`}
+            >
+                <p>
+                    Casting {name}
+                    ...
+                </p>
+            </div>
+            <img
+                src={image}
+                alt=""
+                className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
+            />
+            <p className="capitalize">{name}</p>
+            <button
+                onClick={() => vote(id)}
+                className="px-3 py-1 rounded bg-slate-300 text-gray-900 mt-2"
+            >
+                Rounder
+            </button>
+        </div>
+    );
 }
