@@ -10,12 +10,14 @@ export type State = {
         secondId: number;
     };
     chosenId: number | null;
+    firstTime: boolean;
 };
 
 export default function Home() {
     const initialState: State = {
         ids: getOptionsForVote(),
         chosenId: null,
+        firstTime: true,
     };
 
     const [state, dispatch] = useReducer((state: State, action: any) => {
@@ -30,6 +32,11 @@ export default function Home() {
                 return {
                     ...state,
                     chosenId: payload,
+                };
+            case "SET_FIRST_TIME":
+                return {
+                    ...state,
+                    firstTime: payload,
                 };
             default:
                 return state;
@@ -49,7 +56,12 @@ export default function Home() {
 
     const castVote = (id: number) => {
         // todo: fire mutation for the vote caste
+
         dispatch({ type: "SET_CHOSEN_ID", payload: id });
+        if (state.firstTime) {
+            dispatch({ type: "SET_FIRST_TIME", payload: false });
+        }
+
         const timer = setTimeout(() => {
             dispatch({ type: "NEW_IDS" });
             refetchPoke();
@@ -74,8 +86,10 @@ export default function Home() {
                     className={"min-h-screen w-full grid place-content-center"}
                 >
                     <h1 className="font-bold text-4xl text-center">
-                        {isLoading
-                            ? "loading...."
+                        {isLoading && state.firstTime
+                            ? "loading Pokemon...."
+                            : isLoading && !state.firstTime
+                            ? "loading Another Pokemon...."
                             : isError
                             ? error.message
                             : null}
@@ -117,7 +131,10 @@ export default function Home() {
                                         <p>Casting {firstPoke?.name}</p>
                                     </div>
                                     <img
-                                        src={firstPoke?.sprites.front_default as string}
+                                        src={
+                                            firstPoke?.sprites
+                                                .front_default as string
+                                        }
                                         alt=""
                                         className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
                                     />
@@ -149,7 +166,10 @@ export default function Home() {
                                         </p>
                                     </div>
                                     <img
-                                        src={secondPoke?.sprites.front_default as string}
+                                        src={
+                                            secondPoke?.sprites
+                                                .front_default as string
+                                        }
                                         alt=""
                                         className="rounded-lg object-cover object-center w-56 h-56 cursor-pointer"
                                     />
