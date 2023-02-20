@@ -1,10 +1,8 @@
-import React, { useState, useMemo, useReducer } from "react";
+import React, { useReducer } from "react";
 import Head from "next/head";
-import { Inter, Open_Sans } from "@next/font/google";
 import { trpc } from "@utils/trpc";
 import { getOptionsForVote } from "@utils/getRandomPokemon";
 
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
     const [state, dispatch] = useReducer(
