@@ -124,9 +124,9 @@ export default function Home() {
                                 <PokemonCard
                                     id={state.ids.firstId}
                                     chosenId={state.chosenId}
-                                    name={data.firstPoke?.name as string}
+                                    name={firstPoke?.name as string}
                                     image={
-                                        data.firstPoke?.sprites
+                                        firstPoke?.sprites
                                             .front_default as string
                                     }
                                     vote={castVote}
@@ -135,9 +135,9 @@ export default function Home() {
                                 <PokemonCard
                                     id={state.ids.secondId}
                                     chosenId={state.chosenId}
-                                    name={data.secondPoke?.name as string}
+                                    name={secondPoke?.name as string}
                                     image={
-                                        data.secondPoke?.sprites
+                                        secondPoke?.sprites
                                             .front_default as string
                                     }
                                     vote={castVote}
